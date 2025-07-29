@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Contact = require('../models/Contact');
+const Contact = require('../models/contacts');
 const nodemailer = require('nodemailer');
 
 // 🔹 Obtener todos los contactos

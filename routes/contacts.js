@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Contact = require('../models/contacts');
+const Contact = require('../models/Contact');
 const nodemailer = require('nodemailer');
 
 // 🔹 Obtener todos los contactos
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const contacts = await Contact.find();
     res.json(contacts);

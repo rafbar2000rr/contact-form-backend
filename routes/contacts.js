@@ -56,27 +56,55 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-// 🔹 Editar un contacto existente
 router.put('/:id', async (req, res) => {
   try {
-    const updated = await Contact.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    if (!updatedContact) {
+      return res.status(404).json({ error: 'Contacto no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Contacto actualizado con éxito', contact: updatedContact });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar el contacto' });
   }
 });
 
+// 🔹 Editar un contacto existente
+// router.put('/:id', async (req, res) => {
+//   try {
+//     const updated = await Contact.findByIdAndUpdate(req.params.id, req.body, { new: true });
+//     res.json(updated);
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedContact = await Contact.findByIdAndDelete(req.params.id);
+
+    if (!deletedContact) {
+      return res.status(404).json({ error: 'Contacto no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Contacto eliminado con éxito' });
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudo eliminar el contacto' });
+  }
+});
 
 
 // 🔹 Eliminar un contacto
-router.delete('/:id', async (req, res) => {
-  try {
-    await Contact.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Contacto eliminado' });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+// router.delete('/:id', async (req, res) => {
+//   try {
+//     await Contact.findByIdAndDelete(req.params.id);
+//     res.json({ message: 'Contacto eliminado' });
+//   } catch (err) {
+//     res.status(400).json({ error: err.message });
+//   }
+// });
 
 module.exports = router;

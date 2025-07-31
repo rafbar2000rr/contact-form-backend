@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // 🔹 Esto debe ir al inicio para usar las variables de entorno
+require('dotenv').config(); //Esto debe ir al inicio para usar las variables de entorno
 
-const contactRoutes = require('./routes/contacts'); // 🔹 Importa tus rutas
+const contactRoutes = require('./routes/contacts'); // Importa las rutas
 
 const app = express(); // la función express() devuelve un objeto app que representa tu servidor web.
 

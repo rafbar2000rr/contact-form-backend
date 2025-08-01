@@ -1,3 +1,4 @@
+// ───── Importaciones de Módulos ───────────────────────────────────────────
 const express = require('express');//Importa el módulo express, que es el framework para construir el servidor web en Node.js.
 const router = express.Router();//Se usa para definir rutas separadas del archivo principal app.js. 
                                 // Por ejemplo: rutas como /api/contacts.En lugar de declarar directamente en 
@@ -6,15 +7,13 @@ const router = express.Router();//Se usa para definir rutas separadas del archiv
 const Contact = require('../models/Contact');// Importa el modelo Contact que definiste antes con Mongoose.Con esto 
                                       // puedes hacer cosas como:Crear un contacto: Contact.create({ ... }),Buscar 
                                       // contactos: Contact.find()Eliminar o editar, etc.
-
-
 const nodemailer = require('nodemailer');//Importa la librería nodemailer, que sirve para enviar correos electrónicos desde el backend.
 
 //Usa express.Router() para definir rutas relacionadas a contactos.
 //Usa el modelo Contact para guardar o leer contactos desde MongoDB.
 //Usa nodemailer para enviar correos.
 
-// Obtener todos los contactos
+// ───── GET: Obtener todos los contactos ─────────────────
 router.get('/', async (req, res) => {//Define una ruta que responde a solicitudes GET. Es asincrónica (async) porque va a hacer una operación que toma tiempo: consultar la base de datos.
   try {//Maneja errores para no romper la app si algo falla
     const contacts = await Contact.find();//Dentro del try, usamos await para esperar a que Mongoose consulte todos los contactos en la base de datos.Contact.find() busca todos los documentos (registros) en la colección contacts.
@@ -24,7 +23,7 @@ router.get('/', async (req, res) => {//Define una ruta que responde a solicitude
   }
 });
 
-
+// ───── POST: Crear contacto y enviar email ─────────────
 router.post('/', async (req, res) => {//Define una ruta para manejar solicitudes HTTP POST. La función es async porque vamos a guardar datos en MongoDB (toma tiempo)
   console.log("✅ POST /contact recibido");// Solo muestra en consola que se ha recibido la petición y qué datos llegaron.
   console.log("Datos recibidos:", req.body);//req.body contiene el JSON que envió el frontend o el formulario.
@@ -34,14 +33,14 @@ router.post('/', async (req, res) => {//Define una ruta para manejar solicitudes
     // petición.Esto es destructuración de objeto: equivale a escribir const name = req.body.name, 
     // const address = req.body.address, etc.
 
-    // Guardar en MongoDB
+ // 1. Guardar en MongoDB
     const contact = new Contact({ name, address, email });//Creamos una nueva instancia del modelo Contact con los datos 
                                         //recibidos.Esto representa un nuevo documento que queremos guardar en MongoDB.
     await contact.save();//Guardamos el documento en MongoDB. await indica que esperamos a que termine el proceso antes
                         //de seguir.
     console.log("📦 Contacto guardado en MongoDB");
 
-    // Configurar el transporte de Nodemailer
+    // 2. Enviar email con nodemailer  (Configurar el transporte de Nodemailer)
     const transporter = nodemailer.createTransport({//Crea un transportador, es decir, una "configuración" que Nodemailer usará para enviar los correos.
       service: 'gmail',
       auth: {//Proporciona las credenciales para autenticarte en la cuenta que enviará el correo.
@@ -62,7 +61,7 @@ router.post('/', async (req, res) => {//Define una ruta para manejar solicitudes
     await transporter.sendMail(mailOptions);//Usa la configuración del transportador (transporter) y envía un correo con los datos que están en mailOptions. Espera a que se termine de enviar antes de seguir
     console.log("✉️ Email enviado correctamente");
 
-    // Enviar respuesta al frontend
+    // 3. Respuesta al cliente  (Enviar respuesta al frontend)
     res.status(200).json({ message: "Contacto guardado y email enviado" });//Es para enviar una respuesta al cliente 
                                                     // (por ejemplo, tu app React) diciendo que se guardó con éxito.
 
@@ -73,6 +72,7 @@ router.post('/', async (req, res) => {//Define una ruta para manejar solicitudes
   }
 });
 
+// ───── PUT: Actualizar contacto ─────────────────────────
 router.put('/:id', async (req, res) => {
   try {
     const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, {//Contact.findByIdAndUpdate(...): 
@@ -91,16 +91,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// 🔹 Editar un contacto existente
-// router.put('/:id', async (req, res) => {
-//   try {
-//     const updated = await Contact.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     res.json(updated);
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
 
+// ───── DELETE: Eliminar contacto ────────────────────────
 router.delete('/:id', async (req, res) => {
   try {
     const deletedContact = await Contact.findByIdAndDelete(req.params.id);//Esta línea define una ruta DELETE en /api/contactos/:id, donde :id representa el ID del contacto que queremos eliminar.
@@ -116,15 +108,6 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-
-// 🔹 Eliminar un contacto
-// router.delete('/:id', async (req, res) => {
-//   try {
-//     await Contact.findByIdAndDelete(req.params.id);
-//     res.json({ message: 'Contacto eliminado' });
-//   } catch (err) {
-//     res.status(400).json({ error: err.message });
-//   }
-// });
-
+// ───── Exportar rutas ───────────────────────────────────
 module.exports = router;
+
